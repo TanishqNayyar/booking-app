@@ -3,7 +3,10 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { fetchExpertById, fetchBookings } from '../api';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const socket = io(process.env.REACT_APP_API_URL, {
+  transports: ["websocket"],
+  withCredentials: true
+});
 
 const ExpertDetail = () => {
   const { id } = useParams();
