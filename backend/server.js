@@ -11,11 +11,38 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://booking-88dor2d4t-tanishq-nayyars-projects.vercel.app"
+  "https://booking-app-gilt-six.vercel.app", 
+  "https://booking-88dor2d4t-tanishq-nayyars-projects.vercel.app" 
 ];
 
 // Middleware
 app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman) + server-to-server
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS: " + origin));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// ✅ Preflight for all routes
+app.options("*", cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS: " + origin));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+app.options("*", cors({
   origin: allowedOrigins,
   credentials: true
 }));
