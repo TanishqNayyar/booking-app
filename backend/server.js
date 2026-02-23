@@ -15,26 +15,12 @@ const allowedOrigins = [
   "https://booking-88dor2d4t-tanishq-nayyars-projects.vercel.app"
 ];
 
-// Middleware
+// ✅ CORS (must be BEFORE routes)
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests with no origin (like Postman) + server-to-server
+    // Allow requests with no origin (Postman, server-to-server)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error("Not allowed by CORS: " + origin));
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
-
-// ✅ Preflight for all routes
-app.options("*", cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
     return callback(new Error("Not allowed by CORS: " + origin));
   },
@@ -42,10 +28,20 @@ app.options("*", cors({
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
+// ✅ Preflight for all routes (NO "*")
 app.options(/.*/, cors({
-  origin: allowedOrigins,
-  credentials: true
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS: " + origin));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 app.use(express.json());
 
 // Socket.io Setup
@@ -74,9 +70,7 @@ app.set('io', io);
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('MongoDB Connected');
-  })
+  .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
 // Routes
