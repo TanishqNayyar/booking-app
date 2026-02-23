@@ -11,8 +11,8 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://booking-app-gilt-six.vercel.app", 
-  "https://booking-88dor2d4t-tanishq-nayyars-projects.vercel.app" 
+  "https://booking-app-gilt-six.vercel.app",
+  "https://booking-88dor2d4t-tanishq-nayyars-projects.vercel.app"
 ];
 
 // Middleware
@@ -42,7 +42,7 @@ app.options("*", cors({
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
-app.options("*", cors({
+app.options(/.*/, cors({
   origin: allowedOrigins,
   credentials: true
 }));
